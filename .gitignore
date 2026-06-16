@@ -1,0 +1,9 @@
+*.tar.gz
+*.zip
+build/
+install/
+log/
+__pycache__/
+*.pyc
+*.bag
+*.pcd

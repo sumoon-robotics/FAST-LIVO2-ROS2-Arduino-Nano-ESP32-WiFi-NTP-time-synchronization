@@ -1,0 +1,17 @@
+/**:
+  ros__parameters:
+    cam_model: Pinhole
+    # Native: 1440×1080 — scale=0.5 → 720×540
+    cam_width: 720
+    cam_height: 540
+    scale: 0.5
+    # Calibrated values — HIKrobot MV-CA016-10UC
+    # Obtained via ros2 run camera_calibration cameracalibrator (8x6 checkerboard)
+    cam_fx: 879.098
+    cam_fy: 879.804
+    cam_cx: 352.076
+    cam_cy: 272.032
+    cam_d0: -0.122045   # k1
+    cam_d1:  0.117873   # k2
+    cam_d2: -0.000884   # p1
+    cam_d3: -0.001858   # p2

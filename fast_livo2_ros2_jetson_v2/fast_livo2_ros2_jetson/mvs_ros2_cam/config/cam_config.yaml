@@ -1,0 +1,41 @@
+%YAML:1.0
+---
+# HIKrobot MV-CA016-10UC  —  USB3, hardware-triggered from STM32 Line0
+# Used by: grab_trigger_ros2  (argv[1])
+
+# ── Trigger ──────────────────────────────────────────────
+TriggerEnable: 1           # 1 = Line0 hardware trigger, 0 = free-run
+
+# ── Device selection ─────────────────────────────────────
+# Leave empty if only one camera is connected.
+# Fill in the SN printed at startup if multiple cameras exist.
+SerialNumber: ""
+
+# ── ROS topic ────────────────────────────────────────────
+# Must match img_topic in FAST-LIVO2 mid360.yaml
+TopicName: "/left_camera/image"
+
+# ── Pixel format index into [RGB8, BayerRG8, BayerRG12Packed, BayerGB12Packed, BayerGB8] ──
+# MV-CA016-10UC (color) → BayerRG8 (index 1)
+PixelFormat: 1
+
+# ── Image scale (applied after debayer) ──────────────────
+# 1.0 = full res (1440×1080), 0.5 = half res
+image_scale: 0.5
+
+# ── Exposure ─────────────────────────────────────────────
+# ExposureAutoMode: 0=Off(fixed), 1=Once, 2=Continuous
+ExposureAutoMode: 2
+AutoExposureTimeLower: 500     # us
+AutoExposureTimeUpper: 20000   # us
+ExposureTime: 5000             # us (used only when ExposureAutoMode=0)
+
+# ── Gain ─────────────────────────────────────────────────
+# GainAuto: 0=Off, 1=Once, 2=Continuous
+GainAuto: 0
+Gain: 5.0
+
+# ── Gamma ────────────────────────────────────────────────
+# GammaSelector: 0=User, 1=sRGB, 2=Off
+GammaSelector: 1
+Gamma: 0.7

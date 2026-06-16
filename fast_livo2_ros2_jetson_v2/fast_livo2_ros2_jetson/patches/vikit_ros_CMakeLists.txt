@@ -1,0 +1,84 @@
+# patches/vikit_ros_CMakeLists.txt
+# Drop-in replacement for rpg_vikit/vikit_ros/CMakeLists.txt
+#
+# Fixes applied vs original:
+#   1. Removed undefined ${cpp_typesupport_target} link
+#   2. Sophus added via target property
+#   3. vikit_common linked via absolute .so path (ament export not consumed correctly)
+#   4. ament_export_targets + ament_export_libraries added
+
+cmake_minimum_required(VERSION 3.10)
+project(vikit_ros)
+
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -mcpu=native -ffast-math -pthread")
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -pthread")
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(vikit_common REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(OpenCV REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(Sophus REQUIRED)
+
+set(dependencies
+  rclcpp
+  vikit_common
+  visualization_msgs
+  tf2
+  tf2_ros
+  tf2_geometry_msgs
+)
+
+add_library(vikit_ros SHARED
+  src/output_helper.cpp
+  src/camera_loader.cpp
+)
+
+target_include_directories(vikit_ros PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${EIGEN3_INCLUDE_DIR}
+  ${OpenCV_INCLUDE_DIRS}
+  $<TARGET_PROPERTY:Sophus::Sophus,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
+# NOTE: vikit_common linked via absolute path — ament export of .so
+# not reliably propagated. Update path if workspace location changes.
+target_link_libraries(vikit_ros
+  /mnt/ssd/fast_livo2_ros2_ws/install/vikit_common/lib/libvikit_common.so
+  ${OpenCV_LIBS}
+  Eigen3::Eigen
+  Sophus::Sophus
+)
+
+ament_target_dependencies(vikit_ros ${dependencies})
+
+install(TARGETS vikit_ros
+  EXPORT vikit_ros_export
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(DIRECTORY include/
+  DESTINATION include
+)
+
+ament_export_targets(vikit_ros_export HAS_LIBRARY_TARGET)
+ament_export_include_directories(include)
+ament_export_libraries(vikit_ros)
+ament_export_dependencies(${dependencies} Sophus)
+
+ament_package()
